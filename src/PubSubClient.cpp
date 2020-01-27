@@ -114,11 +114,19 @@ boolean PubSubClient::connect(const char *id, const char* willTopic, uint8_t wil
     return connect(id,NULL,NULL,willTopic,willQos,willRetain,willMessage,1);
 }
 
+boolean PubSubClient::connect(const char *id, const char *willTopic, uint8_t willQos, boolean willRetain, const uint8_t *willMessage, unsigned int msglength) {
+    return connect(id,NULL,NULL,willTopic,willQos,willRetain,(const char *)willMessage,msglength,1);
+}
+
 boolean PubSubClient::connect(const char *id, const char *user, const char *pass, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage) {
     return connect(id,user,pass,willTopic,willQos,willRetain,willMessage,1);
 }
 
 boolean PubSubClient::connect(const char *id, const char *user, const char *pass, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage, boolean cleanSession) {
+    return connect(id, user, pass, willTopic, willQos, willRetain, willMessage, strlen(willMessage), cleanSession);
+}
+
+boolean PubSubClient::connect(const char *id, const char *user, const char *pass, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, unsigned int msglength, boolean cleanSession) {
     if (!connected()) {
         int result = 0;
 
@@ -178,8 +186,8 @@ boolean PubSubClient::connect(const char *id, const char *user, const char *pass
             if (willTopic) {
                 CHECK_STRING_LENGTH(length,willTopic)
                 length = writeString(willTopic,buffer,length);
-                CHECK_STRING_LENGTH(length,willMessage)
-                length = writeString(willMessage,buffer,length);
+                CHECK_BYTES_LENGTH(length, msglength)
+                length = writeBytes(willMessage,msglength,buffer,length);
             }
 
             if(user != NULL) {
@@ -601,18 +609,18 @@ void PubSubClient::disconnect() {
 }
 
 uint16_t PubSubClient::writeString(const char* string, uint8_t* buf, uint16_t pos) {
-    const char* idp = string;
+    return writeBytes(string, strlen(string), buf, pos);
+}
+
+uint16_t PubSubClient::writeBytes(const char* bytes, unsigned int len, uint8_t* buf, uint16_t pos) {
     uint16_t i = 0;
     pos += 2;
-    while (*idp) {
-        buf[pos++] = *idp++;
-        i++;
-    }
+    for (i = 0; i < len; i++)
+        buf[pos++] = bytes[i];
     buf[pos-i-2] = (i >> 8);
     buf[pos-i-1] = (i & 0xFF);
     return pos;
 }
-
 
 boolean PubSubClient::connected() {
     boolean rc;

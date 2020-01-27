@@ -83,7 +83,8 @@
 #define MQTT_CALLBACK_SIGNATURE void (*callback)(char*, uint8_t*, unsigned int)
 #endif
 
-#define CHECK_STRING_LENGTH(l,s) if (l+2+strlen(s) > MQTT_MAX_PACKET_SIZE) {_client->stop();return false;}
+#define CHECK_BYTES_LENGTH(l,bl) if (l+2+bl > MQTT_MAX_PACKET_SIZE) {_client->stop();return false;}
+#define CHECK_STRING_LENGTH(l,s) CHECK_BYTES_LENGTH(l, strlen(s))
 
 class PubSubClient : public Print {
 private:
@@ -99,6 +100,7 @@ private:
    boolean readByte(uint8_t * result, uint16_t * index);
    boolean write(uint8_t header, uint8_t* buf, uint16_t length);
    uint16_t writeString(const char* string, uint8_t* buf, uint16_t pos);
+   uint16_t writeBytes(const char* bytes, unsigned int len, uint8_t* buf, uint16_t pos);
    // Build up the header ready to send
    // Returns the size of the header
    // Note: the header is built at the end of the first MQTT_MAX_HEADER_SIZE bytes, so will start
@@ -135,8 +137,10 @@ public:
    boolean connect(const char* id);
    boolean connect(const char* id, const char* user, const char* pass);
    boolean connect(const char* id, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage);
+   boolean connect(const char *id, const char *willTopic, uint8_t willQos, boolean willRetain, const uint8_t *willMessage, unsigned int msglength);
    boolean connect(const char* id, const char* user, const char* pass, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage);
    boolean connect(const char* id, const char* user, const char* pass, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage, boolean cleanSession);
+   boolean connect(const char *id, const char *user, const char *pass, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, unsigned int msglength, boolean cleanSession);
    void disconnect();
    boolean publish(const char* topic, const char* payload);
    boolean publish(const char* topic, const char* payload, boolean retained);
