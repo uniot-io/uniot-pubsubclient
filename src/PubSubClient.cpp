@@ -127,6 +127,10 @@ boolean PubSubClient::connect(const char *id, const char *user, const char *pass
 }
 
 boolean PubSubClient::connect(const char *id, const char *user, const char *pass, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, unsigned int msglength, boolean cleanSession) {
+    return connect(id, user, pass, strlen(pass), willTopic, willQos, willRetain, willMessage, strlen(willMessage), cleanSession);
+}
+
+boolean PubSubClient::connect(const char *id, const char *user, const char *pass, unsigned int passLen, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, unsigned int msglength, boolean cleanSession) {
     if (!connected()) {
         int result = 0;
 
@@ -194,8 +198,8 @@ boolean PubSubClient::connect(const char *id, const char *user, const char *pass
                 CHECK_STRING_LENGTH(length,user)
                 length = writeString(user,buffer,length);
                 if(pass != NULL) {
-                    CHECK_STRING_LENGTH(length,pass)
-                    length = writeString(pass,buffer,length);
+                    CHECK_BYTES_LENGTH(length,passLen)
+                    length = writeBytes(pass,passLen,buffer,length);
                 }
             }
 

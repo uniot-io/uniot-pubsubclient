@@ -141,6 +141,7 @@ public:
    boolean connect(const char* id, const char* user, const char* pass, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage);
    boolean connect(const char* id, const char* user, const char* pass, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage, boolean cleanSession);
    boolean connect(const char *id, const char *user, const char *pass, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, unsigned int msglength, boolean cleanSession);
+   boolean connect(const char *id, const char *user, const char *pass, unsigned int passLen, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, unsigned int msglength, boolean cleanSession);
    void disconnect();
    boolean publish(const char* topic, const char* payload);
    boolean publish(const char* topic, const char* payload, boolean retained);
